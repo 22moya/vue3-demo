@@ -6,7 +6,8 @@
   </div>
    <!--queary-->
   <div class="query-box">
-    <el-input class="query-input" v-model="queryInput" placeholder="请输入姓名搜索" />
+    <el-input class="query-input" v-model="queryInput" placeholder="请输入姓名搜索"
+    @input="handleQueryName"/>
     <div class="btn-list">
       <el-button type="primary" @click="handleAdd">增加</el-button>
       <el-button type="danger" @click="handleDelList" v-if="multipleSelection.length > 0">删除多选</el-button>
@@ -30,7 +31,7 @@
     <el-table-column fixed="right" label="操作" width="120">
       <template #default="scope">
         <el-button link type="primary" size="small" @click="handleRowDel(scope.row)" style="color:#F56C6C">删除</el-button>
-        <el-button link type="primary" size="small">编辑</el-button>
+        <el-button link type="primary" size="small" @click="handleEdit(scope.row)">编辑</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -108,6 +109,7 @@
        address: 'No. 189, Grove St, Los Angeles',
      },
    ])
+   let tableDataCopy=Object.assign(tableData)
    let multipleSelection=$ref([])
    let dialogFormVisible =$ref(false)
    let tableForm=$ref({
@@ -147,18 +149,42 @@ const handleSelectionChange = (val) => {
 const handleAdd=()=>{
   dialogFormVisible=true
   tableForm={}
+  dialogType='add'
 }
 //确认
 const dialogConfirm=()=>{
      dialogFormVisible =false
-  // 拿到数据
-  //tableForm
-  tableData.push({
-    id:(tableData.length +1).toString(),
-    ...tableForm
-  })
-  console.log(tableData);
+  if(dialogType==='add'){
+    // 拿到数据
+    //tableForm
+    tableData.push({
+      id:(tableData.length +1).toString(),
+      ...tableForm
+    })
+
+  }else {
+    let index=tableData.findIndex(item=>item.id===tableForm.id)
+    tableData[index]=tableForm
+  }
+
+
 }
+//编辑
+const handleEdit=(row)=>{
+  dialogFormVisible=true
+  dialogType = 'edit'
+
+
+  tableForm={...row}
+}
+//搜索
+   const handleQueryName=(val)=>{
+if (val.length >0){
+  tableData =tableData.filter(item =>(item.name).toLowerCase().match(val.toLowerCase()))
+}else{
+  tableData=tableDataCopy
+}
+   }
 </script>
 
 
